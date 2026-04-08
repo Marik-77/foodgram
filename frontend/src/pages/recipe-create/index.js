@@ -136,10 +136,10 @@ const RecipeCreate = ({ onEdit }) => {
               name: recipeName,
               ingredients: recipeIngredients.map((item) => ({
                 id: item.id,
-                amount: item.amount,
+                amount: Number(item.amount),
               })),
               tags: value.filter((item) => item.value).map((item) => item.id),
-              cooking_time: recipeTime,
+              cooking_time: Number(recipeTime),
               image: recipeFile,
             };
             api
@@ -325,7 +325,6 @@ const RecipeCreate = ({ onEdit }) => {
             onChange={(file) => {
               setRecipeFile(file);
             }}
-            fileTypes={["image/png", "image/jpeg"]}
             fileSize={5000}
             className={styles.fileInput}
             label="Загрузить фото"
