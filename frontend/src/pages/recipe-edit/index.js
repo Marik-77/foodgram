@@ -388,6 +388,7 @@ const RecipeEdit = ({ onItemDelete }) => {
               setRecipeFileWasManuallyChanged(true);
               setRecipeFile(file);
             }}
+            fileTypes={["image/png", "image/jpeg"]}
             fileSize={5000}
             className={styles.fileInput}
             label="Загрузить фото"
