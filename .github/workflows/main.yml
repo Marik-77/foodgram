@@ -107,8 +107,19 @@ jobs:
               echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
             fi
 
-            docker compose -f docker-compose.production.yml pull
-            docker compose -f docker-compose.production.yml up -d --remove-orphans
+            # Доступ к Docker: либо пользователь в группе docker, либо passwordless sudo (sudo -n).
+            if docker info >/dev/null 2>&1; then
+              SUDO=""
+            elif sudo -n docker info >/dev/null 2>&1; then
+              SUDO="sudo "
+            else
+              echo "Нет доступа к Docker. На сервере выполните: sudo usermod -aG docker ${{ secrets.SERVER_USER }}"
+              echo "Затем переподключитесь по SSH или выполните: newgrp docker"
+              exit 1
+            fi
 
-            docker compose -f docker-compose.production.yml ps
-            docker image prune -f
+            ${SUDO}docker compose -f docker-compose.production.yml pull
+            ${SUDO}docker compose -f docker-compose.production.yml up -d --remove-orphans
+
+            ${SUDO}docker compose -f docker-compose.production.yml ps
+            ${SUDO}docker image prune -f
