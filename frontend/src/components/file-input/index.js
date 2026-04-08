@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './styles.module.css'
-import btnStyles from '../button/style.module.css'
 import cn from 'classnames'
 import Icons from '../icons'
 
@@ -65,40 +64,32 @@ const FileInput = ({
   return (
     <div className={cn(styles.container, className)}>
       {label && <span className={styles.label}>{label}</span>}
-      {reading ? (
-        <span
-          className={cn(
-            btnStyles.button,
-            btnStyles.button_style_light,
-            btnStyles.button_disabled,
-            styles.pickLabel,
-            styles.pickLabelMuted
-          )}
-        >
-          Обработка файла…
-        </span>
-      ) : (
-        <label
-          className={cn(
-            btnStyles.button,
-            btnStyles.button_style_light,
-            styles.pickLabel
-          )}
-          title="Файл уходит на сервер при нажатии «Создать рецепт» или «Сохранить»."
-        >
-          <span className={styles.pickText}>Выбрать файл</span>
-          <input
-            type="file"
-            className={styles.fileInput}
-            accept="image/png,image/jpeg,image/jpg,image/heic,image/heif,.heic,.heif"
-            ref={fileInputRef}
-            onChange={(e) => {
-              const f = e.target.files[0]
-              getBase64(f)
-            }}
-          />
-        </label>
-      )}
+      <div className={styles.controls}>
+        {reading ? (
+          <span className={styles.reading}>Обработка файла…</span>
+        ) : (
+          <>
+            {/*
+              Нативный input без скрытия: браузеры (особенно мобильные) часто блокируют
+              кастомные кнопки + opacity:0 / display:none. Папки на сервере для этого не нужны.
+            */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/heic,image/heif,.heic,.heif"
+              disabled={reading}
+              className={styles.nativeInput}
+              onChange={(e) => {
+                const f = e.target.files[0]
+                getBase64(f)
+              }}
+            />
+            <p className={styles.hint}>
+              Нажмите кнопку выбора файла выше. На сервер данные уйдут только после «Создать рецепт».
+            </p>
+          </>
+        )}
+      </div>
       {currentFile && (
         <div
           className={styles.image}
