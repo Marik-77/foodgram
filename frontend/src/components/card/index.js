@@ -124,7 +124,11 @@ const Card = ({
           >
             <Icons.LikeIcon />
           </Button>
-          <Tooltip id={id.toString()} />
+          <Tooltip
+            id={id.toString()}
+            className="app-tooltip"
+            style={{ backgroundColor: "#3f3f46", color: "#ffffff" }}
+          />
         </div>
       </div>
     </div>

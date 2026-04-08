@@ -119,7 +119,11 @@ const SingleCard = ({ loadItem, updateOrders }) => {
                 >
                   <Icons.CopyLinkIcon />
                 </Button>
-                <Tooltip id="tooltip-copy" />
+                <Tooltip
+                  id="tooltip-copy"
+                  className="app-tooltip"
+                  style={{ backgroundColor: "#3f3f46", color: "#ffffff" }}
+                />
                 {authContext && (
                   <>
                     <Button
@@ -141,7 +145,11 @@ const SingleCard = ({ loadItem, updateOrders }) => {
                     >
                       <Icons.LikeIcon />
                     </Button>
-                    <Tooltip id="tooltip-save" />
+                    <Tooltip
+                      id="tooltip-save"
+                      className="app-tooltip"
+                      style={{ backgroundColor: "#3f3f46", color: "#ffffff" }}
+                    />
                   </>
                 )}
               </div>
@@ -197,7 +205,11 @@ const SingleCard = ({ loadItem, updateOrders }) => {
                   >
                     <Icons.AddUser />
                   </Button>
-                  <Tooltip id="tooltip-subscribe" />
+                  <Tooltip
+                    id="tooltip-subscribe"
+                    className="app-tooltip"
+                    style={{ backgroundColor: "#3f3f46", color: "#ffffff" }}
+                  />
                 </>
               )}
             </div>
