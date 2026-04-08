@@ -14,6 +14,7 @@ const FileInput = ({
   fileTypes
 }) => {
   const [ currentFile, setCurrentFile ] = useState(file)
+  const [ reading, setReading ] = useState(false)
   const fileInput = useRef(null)
 
   useEffect(_ => {
@@ -23,6 +24,9 @@ const FileInput = ({
   }, [file])
 
   const getBase64 = (file) => {
+    if (!file) {
+      return
+    }
     const reader = new FileReader()
 
     if (fileSize && ((file.size / 1000) > fileSize)) {
@@ -31,13 +35,16 @@ const FileInput = ({
     if (fileTypes && !fileTypes.includes(file.type)) {
       return alert(`Загрузите файл одного из типов: ${fileTypes.join(', ')}`)
     }
-    reader.readAsDataURL(file);
+    setReading(true)
+    reader.readAsDataURL(file)
     reader.onload = function () {
       setCurrentFile(reader.result)
       onChange(reader.result)
-    };
+      setReading(false)
+    }
     reader.onerror = function (error) {
-      console.log('Error: ', error);
+      console.log('Error: ', error)
+      setReading(false)
     }
   }
 
@@ -60,8 +67,9 @@ const FileInput = ({
       }}
       className={styles.button}
       type='button'
+      disabled={reading}
     >
-      Выбрать файл
+      {reading ? 'Обработка файла…' : 'Выбрать файл'}
     </Button>
     {currentFile && <div
       className={styles.image}

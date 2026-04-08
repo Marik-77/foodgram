@@ -22,16 +22,24 @@ services:
     volumes:
       - static:/app/static
       - media:/app/media
+      # CSV с ингредиентами: положите data/ingredients.csv рядом с папкой infra (как в репозитории).
+      - ../data:/data:ro
     depends_on:
       db:
         condition: service_healthy
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/admin/"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import socket; s=socket.socket(); s.settimeout(5); s.connect(('127.0.0.1',8000)); s.close()",
+        ]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
 
   frontend:
     container_name: foodgram-front

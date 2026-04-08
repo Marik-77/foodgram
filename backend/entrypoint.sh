@@ -30,7 +30,9 @@ PY
 
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
-python manage.py load_ingredients --path /data/ingredients.csv || true
+if [ -f /data/ingredients.csv ]; then
+  python manage.py load_ingredients --path /data/ingredients.csv
+fi
 
 WORKERS="${GUNICORN_WORKERS:-3}"
 TIMEOUT="${GUNICORN_TIMEOUT:-120}"
