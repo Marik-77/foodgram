@@ -10,7 +10,21 @@ class Api {
         return resolve(res);
       }
       const func = res.status < 400 ? resolve : reject;
-      res.json().then((data) => func(data));
+      const ct = res.headers.get("content-type") || "";
+      const parse = ct.includes("application/json")
+        ? res.json()
+        : res.text().then((t) => {
+            try {
+              return JSON.parse(t);
+            } catch {
+              return { detail: t || res.statusText || `HTTP ${res.status}` };
+            }
+          });
+      parse
+        .then((data) => func(data))
+        .catch(() =>
+          reject({ detail: "Не удалось разобрать ответ сервера", status: res.status })
+        );
     });
   }
 
