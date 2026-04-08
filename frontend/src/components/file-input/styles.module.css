@@ -14,8 +14,35 @@
   font-weight: 600;
 }
 
+/* Текст под прозрачным input: видно «Выбрать файл», клик попадает в type=file */
+.pickLabel {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  margin: 0;
+  cursor: pointer;
+}
+
+.pickText {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
 .fileInput {
-  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.pickLabelMuted {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .image {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './styles.module.css'
-import { Button } from '../index'
+import btnStyles from '../button/style.module.css'
 import cn from 'classnames'
 import Icons from '../icons'
 
@@ -26,7 +26,7 @@ const FileInput = ({
     controlled ? fileProp : null
   )
   const [reading, setReading] = useState(false)
-  const fileInput = useRef(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     if (!controlled) {
@@ -64,32 +64,41 @@ const FileInput = ({
 
   return (
     <div className={cn(styles.container, className)}>
-      {label && (
-        <label className={styles.label}>
-          {label}
+      {label && <span className={styles.label}>{label}</span>}
+      {reading ? (
+        <span
+          className={cn(
+            btnStyles.button,
+            btnStyles.button_style_light,
+            btnStyles.button_disabled,
+            styles.pickLabel,
+            styles.pickLabelMuted
+          )}
+        >
+          Обработка файла…
+        </span>
+      ) : (
+        <label
+          className={cn(
+            btnStyles.button,
+            btnStyles.button_style_light,
+            styles.pickLabel
+          )}
+          title="Файл уходит на сервер при нажатии «Создать рецепт» или «Сохранить»."
+        >
+          <span className={styles.pickText}>Выбрать файл</span>
+          <input
+            type="file"
+            className={styles.fileInput}
+            accept="image/png,image/jpeg,image/jpg,image/heic,image/heif,.heic,.heif"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const f = e.target.files[0]
+              getBase64(f)
+            }}
+          />
         </label>
       )}
-      <input
-        className={styles.fileInput}
-        type="file"
-        accept="image/png,image/jpeg,image/jpg,image/heic,image/heif,.heic,.heif"
-        ref={fileInput}
-        onChange={(e) => {
-          const f = e.target.files[0]
-          getBase64(f)
-        }}
-      />
-      <Button
-        clickHandler={() => {
-          fileInput.current.click()
-        }}
-        className={styles.button}
-        type="button"
-        disabled={reading}
-        title="Файл уходит на сервер при нажатии «Создать рецепт» или «Сохранить», отдельного запроса при выборе файла нет."
-      >
-        {reading ? 'Обработка файла…' : 'Выбрать файл'}
-      </Button>
       {currentFile && (
         <div
           className={styles.image}
@@ -99,8 +108,8 @@ const FileInput = ({
           onClick={() => {
             onChange(null)
             setCurrentFile(null)
-            if (fileInput.current) {
-              fileInput.current.value = null
+            if (fileInputRef.current) {
+              fileInputRef.current.value = null
             }
           }}
         >
