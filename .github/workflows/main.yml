@@ -113,7 +113,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p /home/${{ secrets.SERVER_USER }}/foodgram/infra
+            mkdir -p /home/${{ secrets.SERVER_USER }}/foodgram/infra/ssl
+            mkdir -p /home/${{ secrets.SERVER_USER }}/foodgram/infra/certbot/www
 
       - name: Copy docker-compose and nginx to server
         uses: appleboy/scp-action@v0.1.7
@@ -121,7 +122,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "infra/docker-compose.production.yml,infra/nginx.conf"
+          source: "infra/docker-compose.production.yml,infra/nginx.conf,infra/nginx.http-only.conf"
           target: "/home/${{ secrets.SERVER_USER }}/foodgram/infra/"
           strip_components: 1
 
@@ -145,6 +146,17 @@ jobs:
               echo "DB_HOST=db" >> .env
               echo "DB_PORT=5432" >> .env
               echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
+              echo "CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }}" >> .env
+            fi
+
+            if [ ! -f ssl/fullchain.pem ]; then
+              H="${{ secrets.ALLOWED_HOSTS }}"
+              H=${H%%,*}
+              H=${H// /}
+              [ -z "$H" ] && H=localhost
+              openssl req -x509 -nodes -days 825 -newkey rsa:2048 \
+                -keyout ssl/privkey.pem -out ssl/fullchain.pem \
+                -subj "/CN=$H"
             fi
 
             if docker info >/dev/null 2>&1; then
