@@ -22,7 +22,6 @@ services:
     volumes:
       - static:/app/static
       - media:/app/media
-      # CSV с ингредиентами: положите data/ingredients.csv рядом с папкой infra (как в репозитории).
       - ../data:/data:ro
     depends_on:
       db:
