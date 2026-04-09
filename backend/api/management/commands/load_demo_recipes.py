@@ -8,9 +8,12 @@ from django.db import transaction
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 
 # Минимальный валидный PNG 1×1 (серый пиксель)
-MINI_PNG = base64.b64decode(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+_MINI_PNG_B64 = (
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQ'
+    'DwAEhQGAhKmMIQ'
+    'AAAABJRU5ErkJggg=='
 )
+MINI_PNG = base64.b64decode(_MINI_PNG_B64)
 
 # Имена как в data/ingredients.csv (после load_ingredients).
 DEMO = (
@@ -39,13 +42,19 @@ DEMO = (
 
 
 class Command(BaseCommand):
-    help = 'Создать несколько демо-рецептов (нужны пользователь, теги и ингредиенты в БД).'
+    help = (
+        'Создать несколько демо-рецептов '
+        '(нужны пользователь, теги и ингредиенты в БД).'
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--email',
             default=None,
-            help='Email автора; иначе первый суперпользователь или первый пользователь.',
+            help=(
+                'Email автора; иначе первый суперпользователь '
+                'или первый пользователь.'
+            ),
         )
 
     @transaction.atomic
@@ -55,13 +64,23 @@ class Command(BaseCommand):
         if email:
             user = User.objects.filter(email=email).first()
             if not user:
-                self.stderr.write(self.style.ERROR(f'Пользователь с email={email} не найден.'))
+                self.stderr.write(
+                    self.style.ERROR(
+                        f'Пользователь с email={email} не найден.',
+                    ),
+                )
                 return
         else:
-            user = User.objects.filter(is_superuser=True).first() or User.objects.order_by('id').first()
+            user = (
+                User.objects.filter(is_superuser=True).first()
+                or User.objects.order_by('id').first()
+            )
             if not user:
                 self.stderr.write(
-                    self.style.ERROR('Нет пользователей. Зарегистрируйтесь на сайте или создайте суперпользователя.')
+                    self.style.ERROR(
+                        'Нет пользователей. Зарегистрируйтесь на сайте '
+                        'или создайте суперпользователя.',
+                    ),
                 )
                 return
 
@@ -74,7 +93,9 @@ class Command(BaseCommand):
             if len(tags) != len(item['tag_slugs']):
                 self.stderr.write(
                     self.style.WARNING(
-                        f"Не все теги найдены для «{item['name']}». Выполните миграции и проверьте теги breakfast/lunch/dinner."
+                        f"Не все теги найдены для «{item['name']}». "
+                        'Выполните миграции и проверьте теги '
+                        'breakfast/lunch/dinner.',
                     )
                 )
                 continue
@@ -84,9 +105,11 @@ class Command(BaseCommand):
                 if not ing:
                     self.stderr.write(
                         self.style.WARNING(
-                            f"Ингредиент «{exact_name}» не найден — пропуск рецепта «{item['name']}». "
-                            'Выполните: python manage.py load_ingredients --path /data/ingredients.csv'
-                        )
+                            f"Ингредиент «{exact_name}» не найден — "
+                            f"пропуск рецепта «{item['name']}». "
+                            'Выполните: python manage.py load_ingredients '
+                            '--path /data/ingredients.csv',
+                        ),
                     )
                     ings = None
                     break
@@ -102,7 +125,15 @@ class Command(BaseCommand):
             recipe.image.save('demo.png', ContentFile(MINI_PNG), save=True)
             recipe.tags.set(tags)
             for ing, amount in ings:
-                RecipeIngredient.objects.create(recipe=recipe, ingredient=ing, amount=amount)
+                RecipeIngredient.objects.create(
+                    recipe=recipe,
+                    ingredient=ing,
+                    amount=amount,
+                )
             created += 1
-            self.stdout.write(self.style.SUCCESS(f"Создан рецепт: {item['name']}"))
-        self.stdout.write(self.style.SUCCESS(f'Готово. Новых рецептов: {created}.'))
+            self.stdout.write(
+                self.style.SUCCESS(f"Создан рецепт: {item['name']}"),
+            )
+        self.stdout.write(
+            self.style.SUCCESS(f'Готово. Новых рецептов: {created}.'),
+        )
