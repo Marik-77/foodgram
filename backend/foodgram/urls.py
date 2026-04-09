@@ -13,7 +13,6 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
-    # За nginx (proxy_pass /django_static/) — отдаём admin/DRF static из STATIC_ROOT после collectstatic.
     _static_prefix = settings.STATIC_URL.strip('/')
     urlpatterns.insert(
         0,

@@ -1,8 +1,3 @@
-# Образы → Docker Hub → деплой по SSH. Gunicorn: backend/entrypoint.sh
-#
-# По умолчанию только linux/amd64 (типичный VPS) — без QEMU, в разы быстрее.
-# Multi-arch (amd64+arm64) — вручную: workflow_dispatch и галка multiarch.
-
 name: Build and Deploy
 
 on:

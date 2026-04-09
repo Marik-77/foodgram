@@ -205,14 +205,6 @@ function App() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   document.addEventListener('keydown', function(event) {
-  //     if (event.ctrlKey && event.shiftKey && event.key === 'z') {
-  //       alert('зиги - добар пас!');
-  //     }
-  //   });
-  // }, [])
-
   if (loggedIn === null) {
     return <div className={styles.loading}>Загрузка...</div>;
   }
