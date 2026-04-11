@@ -47,7 +47,9 @@ class SerializerActionMixin:
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def _run_update(request, serializer_class, instance, *, context, partial=False):
+    def _run_update(
+        request, serializer_class, instance, *, context, partial=False
+    ):
         serializer = serializer_class(
             instance,
             data=request.data,
