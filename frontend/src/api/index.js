@@ -36,9 +36,9 @@ class Api {
           const a = document.createElement("a");
           a.href = url;
           a.download = "shopping-list";
-          document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+          document.body.appendChild(a);
           a.click();
-          a.remove(); //afterwards we remove the element again
+          a.remove();
         });
       }
       reject();
@@ -213,7 +213,6 @@ class Api {
     { name, recipe_id, image, tags, cooking_time, text, ingredients },
     wasImageUpdated
   ) {
-    // image was changed
     const token = localStorage.getItem("token");
     return fetch(`/api/recipes/${recipe_id}/`, {
       method: "PATCH",

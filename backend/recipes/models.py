@@ -1,12 +1,28 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from .constants import (
+    INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+    INGREDIENT_NAME_MAX_LENGTH,
+    MIN_COOKING_TIME,
+    MIN_INGREDIENT_AMOUNT,
+    RECIPE_NAME_MAX_LENGTH,
+    TAG_MAX_LENGTH,
+)
 from users.models import User
 
 
 class Tag(models.Model):
-    name = models.CharField('Название', max_length=32, unique=True)
-    slug = models.SlugField('Slug', max_length=32, unique=True)
+    name = models.CharField(
+        'Название',
+        max_length=TAG_MAX_LENGTH,
+        unique=True,
+    )
+    slug = models.SlugField(
+        'Slug',
+        max_length=TAG_MAX_LENGTH,
+        unique=True,
+    )
 
     class Meta:
         ordering = ('id',)
@@ -16,8 +32,14 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField('Название', max_length=128)
-    measurement_unit = models.CharField('Ед. измерения', max_length=64)
+    name = models.CharField(
+        'Название',
+        max_length=INGREDIENT_NAME_MAX_LENGTH,
+    )
+    measurement_unit = models.CharField(
+        'Ед. измерения',
+        max_length=INGREDIENT_MEASUREMENT_UNIT_MAX_LENGTH,
+    )
 
     class Meta:
         ordering = ('name',)
@@ -44,11 +66,15 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         related_name='recipes',
     )
-    name = models.CharField('Название', max_length=256)
+    name = models.CharField(
+        'Название',
+        max_length=RECIPE_NAME_MAX_LENGTH,
+    )
     image = models.ImageField('Изображение', upload_to='recipes/images/')
     text = models.TextField('Описание')
     cooking_time = models.PositiveSmallIntegerField(
-        'Время приготовления', validators=[MinValueValidator(1)]
+        'Время приготовления',
+        validators=[MinValueValidator(MIN_COOKING_TIME)],
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -68,7 +94,7 @@ class RecipeIngredient(models.Model):
         related_name='ingredient_recipes',
     )
     amount = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(MIN_INGREDIENT_AMOUNT)],
     )
 
     class Meta:

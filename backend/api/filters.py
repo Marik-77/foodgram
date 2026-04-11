@@ -20,7 +20,6 @@ class RecipeFilter(django_filters.FilterSet):
     is_in_shopping_cart = django_filters.NumberFilter(
         method='filter_is_in_shopping_cart',
     )
-    author = django_filters.NumberFilter(field_name='author_id')
     tags = django_filters.AllValuesMultipleFilter(field_name='tags__slug')
 
     class Meta:

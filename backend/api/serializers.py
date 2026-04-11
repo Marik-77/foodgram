@@ -75,6 +75,22 @@ class AvatarSerializer(serializers.ModelSerializer):
         model = User
         fields = ('avatar',)
 
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        if not instance.avatar:
+            return {'avatar': None}
+        url = instance.avatar.url
+        return {
+            'avatar': request.build_absolute_uri(url) if request else url,
+        }
+
+
+class AvatarDeleteSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        user = self.context['request'].user
+        user.avatar.delete(save=True)
+        return user
+
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -247,6 +263,133 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return RecipeSerializer(instance, context=self.context).data
+
+
+class FavoriteCreateSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        recipe = self.context['recipe']
+        user = self.context['request'].user
+        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Рецепт уже добавлен.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        return Favorite.objects.create(
+            user=self.context['request'].user,
+            recipe=self.context['recipe'],
+        )
+
+    def to_representation(self, instance):
+        return RecipeMinifiedSerializer(
+            instance.recipe,
+            context=self.context,
+        ).data
+
+
+class FavoriteDeleteSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        recipe = self.context['recipe']
+        user = self.context['request'].user
+        if not Favorite.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Рецепт не найден в списке.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        Favorite.objects.filter(
+            user=self.context['request'].user,
+            recipe=self.context['recipe'],
+        ).delete()
+        return None
+
+
+class ShoppingCartCreateSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        recipe = self.context['recipe']
+        user = self.context['request'].user
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Рецепт уже добавлен.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        return ShoppingCart.objects.create(
+            user=self.context['request'].user,
+            recipe=self.context['recipe'],
+        )
+
+    def to_representation(self, instance):
+        return RecipeMinifiedSerializer(
+            instance.recipe,
+            context=self.context,
+        ).data
+
+
+class ShoppingCartDeleteSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        recipe = self.context['recipe']
+        user = self.context['request'].user
+        if not ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Рецепт не найден в списке.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        ShoppingCart.objects.filter(
+            user=self.context['request'].user,
+            recipe=self.context['recipe'],
+        ).delete()
+        return None
+
+
+class SubscriptionCreateSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        author = self.context['author']
+        user = self.context['request'].user
+        if user == author:
+            raise serializers.ValidationError(
+                {'errors': 'Нельзя подписаться на себя.'},
+            )
+        if Subscription.objects.filter(user=user, author=author).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Подписка уже существует.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        return Subscription.objects.create(
+            user=self.context['request'].user,
+            author=self.context['author'],
+        )
+
+    def to_representation(self, instance):
+        return SubscriptionSerializer(
+            self.context['author'],
+            context=self.context,
+        ).data
+
+
+class SubscriptionDeleteSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        author = self.context['author']
+        user = self.context['request'].user
+        if not Subscription.objects.filter(user=user, author=author).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Подписка не найдена.'},
+            )
+        return attrs
+
+    def create(self, validated_data):
+        Subscription.objects.filter(
+            user=self.context['request'].user,
+            author=self.context['author'],
+        ).delete()
+        return None
 
 
 class SubscriptionSerializer(UserSerializer):
