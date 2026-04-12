@@ -12,6 +12,11 @@ services:
       - ./.env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     container_name: foodgram-backend
@@ -24,7 +29,20 @@ services:
       - media:/app/media
       - ../data:/data
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import socket; s=socket.socket(); s.settimeout(5); s.connect(('127.0.0.1',8000)); s.close()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 90s
 
   frontend:
     container_name: foodgram-front
@@ -46,4 +64,7 @@ services:
       - static:/static/
       - media:/media/
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_completed_successfully
