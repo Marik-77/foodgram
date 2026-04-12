@@ -29,14 +29,15 @@ export default function useRecipes () {
 
   const handleAddToCart = ({ id, toAdd = true, callback }) => {
     const method = toAdd ? api.addToOrders.bind(api) : api.removeFromOrders.bind(api)
+    const idNum = Number(id)
     method({ id }).then(res => {
-      const recipesUpdated = recipes.map(recipe => {
-        if (recipe.id === id) {
-          recipe.is_in_shopping_cart = toAdd
-        }
-        return recipe
-      })
-      setRecipes(recipesUpdated)
+      setRecipes((prev) =>
+        prev.map((recipe) =>
+          Number(recipe.id) === idNum
+            ? { ...recipe, is_in_shopping_cart: toAdd }
+            : recipe
+        )
+      )
       callback && callback(toAdd)
     })
     .catch(err => {

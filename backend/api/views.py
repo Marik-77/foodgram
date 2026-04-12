@@ -279,9 +279,7 @@ class RecipeViewSet(SerializerActionMixin, viewsets.ModelViewSet):
         permission_classes=(AllowAny,),
     )
     def get_link(self, request, pk=None):
-        link = (
-            f'{request.scheme}://{request.get_host()}/recipes/{pk}'
-        )
+        link = f'{request.scheme}://{request.get_host()}/s/{pk}/'
         return Response(
             {'short-link': link},
             status=status.HTTP_200_OK,

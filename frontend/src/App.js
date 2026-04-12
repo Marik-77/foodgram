@@ -277,6 +277,14 @@ function App() {
               onAvatarChange={changeAvatar}
             />
 
+            <Route
+              exact
+              path="/s/:id"
+              render={({ match }) => (
+                <Redirect to={`/recipes/${match.params.id}`} />
+              )}
+            />
+
             <Route exact path="/recipes/:id">
               <SingleCard
                 loggedIn={loggedIn}
