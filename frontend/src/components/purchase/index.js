@@ -20,12 +20,10 @@ const Purchase = ({
     {toDelete && <Popup
       title='Вы уверены, что хотите удалить рецепт?'
       onSubmit={() => {
+        setToDelete(false)
         handleRemoveFromCart({
           id,
           toAdd: false,
-          callback: () => {
-            setToDelete(false)
-          }
         })
       }}
       onClose={() => {

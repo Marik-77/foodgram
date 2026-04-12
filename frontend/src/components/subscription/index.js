@@ -37,11 +37,9 @@ const Subscription = ({
         <Popup
           title="Вы уверены, что хотите отписаться?"
           onSubmit={() => {
+            setToDelete(false);
             removeSubscription({
               id,
-              callback: () => {
-                setToDelete(false);
-              },
             });
           }}
           onClose={() => {

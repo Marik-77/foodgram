@@ -40,10 +40,13 @@ export default function useRecipes () {
       )
       callback && callback(toAdd)
     })
-    .catch(err => {
-      const { errors } = err
-      if (errors) {
-        alert(errors)
+    .catch((err) => {
+      const msg =
+        err?.errors ??
+        err?.detail ??
+        err?.non_field_errors
+      if (msg) {
+        alert(Array.isArray(msg) ? msg.join(", ") : String(msg))
       }
     })
   }

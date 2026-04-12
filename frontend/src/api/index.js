@@ -6,22 +6,46 @@ class Api {
 
   checkResponse(res) {
     return new Promise((resolve, reject) => {
-      if (res.status === 204) {
-        return resolve(res);
+      if (res.status === 204 || res.status === 205) {
+        return resolve(null);
       }
-      const func = res.status < 400 ? resolve : reject;
-      const ct = res.headers.get("content-type") || "";
-      const parse = ct.includes("application/json")
-        ? res.json()
-        : res.text().then((t) => {
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      const isJson = ct.includes("application/json");
+      const parse = isJson
+        ? res.text().then((raw) => {
+            const t = (raw || "").trim();
+            if (!t) {
+              return null;
+            }
             try {
               return JSON.parse(t);
+            } catch {
+              throw new Error("Invalid JSON");
+            }
+          })
+        : res.text().then((t) => {
+            try {
+              const trimmed = (t || "").trim();
+              if (!trimmed) {
+                return null;
+              }
+              return JSON.parse(trimmed);
             } catch {
               return { detail: t || res.statusText || `HTTP ${res.status}` };
             }
           });
       parse
-        .then((data) => func(data))
+        .then((data) => {
+          if (res.status < 400) {
+            resolve(data);
+          } else {
+            reject(
+              data && typeof data === "object"
+                ? data
+                : { detail: res.statusText || `HTTP ${res.status}` }
+            );
+          }
+        })
         .catch(() =>
           reject({ detail: "Не удалось разобрать ответ сервера", status: res.status })
         );
