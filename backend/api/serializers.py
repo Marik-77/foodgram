@@ -299,11 +299,12 @@ class FavoriteDeleteSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        recipe = self.context['recipe']
         Favorite.objects.filter(
             user=self.context['request'].user,
-            recipe=self.context['recipe'],
+            recipe=recipe,
         ).delete()
-        return None
+        return recipe
 
 
 class ShoppingCartCreateSerializer(serializers.Serializer):
@@ -340,11 +341,12 @@ class ShoppingCartDeleteSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        recipe = self.context['recipe']
         ShoppingCart.objects.filter(
             user=self.context['request'].user,
-            recipe=self.context['recipe'],
+            recipe=recipe,
         ).delete()
-        return None
+        return recipe
 
 
 class SubscriptionCreateSerializer(serializers.Serializer):
@@ -385,11 +387,12 @@ class SubscriptionDeleteSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        author = self.context['author']
         Subscription.objects.filter(
             user=self.context['request'].user,
-            author=self.context['author'],
+            author=author,
         ).delete()
-        return None
+        return author
 
 
 class SubscriptionSerializer(UserSerializer):

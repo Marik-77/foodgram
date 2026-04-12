@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import api from '../api'
+import api, { formatApiError } from '../api'
 
 export default function useSubscriptions () {
   const [ subscriptions, setSubscriptions ] = useState([])
@@ -27,13 +27,7 @@ export default function useSubscriptions () {
         callback && callback()
       })
       .catch((err) => {
-        const msg =
-          err?.errors ||
-          err?.detail ||
-          (typeof err === 'string' ? err : null)
-        if (msg) {
-          alert(Array.isArray(msg) ? msg.join(', ') : msg)
-        }
+        alert(formatApiError(err))
       })
   }
   

@@ -39,11 +39,17 @@ class Api {
           if (res.status < 400) {
             resolve(data);
           } else {
-            reject(
-              data && typeof data === "object"
-                ? data
-                : { detail: res.statusText || `HTTP ${res.status}` }
-            );
+            const payload =
+              data && typeof data === "object" && !Array.isArray(data)
+                ? { ...data, status: res.status }
+                : {
+                    detail:
+                      typeof data === "string"
+                        ? data
+                        : res.statusText || `HTTP ${res.status}`,
+                    status: res.status,
+                  };
+            reject(payload);
           }
         })
         .catch(() =>
@@ -412,6 +418,30 @@ class Api {
       },
     }).then(this.checkFileDownloadResponse);
   }
+}
+
+export function formatApiError(err) {
+  const status = err?.status;
+  const pick = err?.errors ?? err?.detail ?? err?.non_field_errors;
+  let text;
+  if (typeof err === "string") {
+    text = err;
+  } else if (pick != null) {
+    text = Array.isArray(pick) ? pick.map(String).join(", ") : String(pick);
+  } else {
+    text = "";
+  }
+  const t = text.trim();
+  if (/^<!doctype/i.test(t) || /<html[\s>]/i.test(t)) {
+    return status ? `Ошибка сервера (HTTP ${status})` : "Ошибка сервера";
+  }
+  if (t.length > 400) {
+    return `${t.slice(0, 400)}…`;
+  }
+  if (t) {
+    return t;
+  }
+  return status ? `Запрос не выполнен (HTTP ${status})` : "Запрос не выполнен";
 }
 
 export default new Api(process.env.API_URL || "http://localhost", {

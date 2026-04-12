@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTags } from './index.js'
-import api from '../api'
+import api, { formatApiError } from '../api'
 
 export default function useRecipes () {
   const [ recipes, setRecipes ] = useState([])
@@ -19,11 +19,8 @@ export default function useRecipes () {
       })
       setRecipes(recipesUpdated)
     })
-    .catch(err => {
-      const { errors } = err
-      if (errors) {
-        alert(errors)
-      }
+    .catch((err) => {
+      alert(formatApiError(err))
     })
   }
 
@@ -41,13 +38,7 @@ export default function useRecipes () {
       callback && callback(toAdd)
     })
     .catch((err) => {
-      const msg =
-        err?.errors ??
-        err?.detail ??
-        err?.non_field_errors
-      if (msg) {
-        alert(Array.isArray(msg) ? msg.join(", ") : String(msg))
-      }
+      alert(formatApiError(err))
     })
   }
 
