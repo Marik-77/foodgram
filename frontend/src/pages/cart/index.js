@@ -1,7 +1,7 @@
 import { PurchaseList, Title, Container, Main, Button } from '../../components'
 import styles from './styles.module.css'
 import { useRecipes } from '../../utils/index.js'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import api from '../../api'
 import MetaTags from 'react-meta-tags'
 
@@ -33,6 +33,18 @@ const Cart = ({ updateOrders, orders }) => {
     api.downloadFile()
   }
 
+  const removeFromCart = ({ id, callback }) => {
+    handleAddToCart({
+      id,
+      toAdd: false,
+      callback: () => {
+        getRecipes()
+        updateOrders(false)
+        callback && callback()
+      },
+    })
+  }
+
   return <Main>
     <Container className={styles.container}>
       <MetaTags>
@@ -44,8 +56,7 @@ const Cart = ({ updateOrders, orders }) => {
         <Title title='Список покупок' />
         <PurchaseList
           orders={recipes}
-          handleRemoveFromCart={handleAddToCart}
-          updateOrders={updateOrders}
+          handleRemoveFromCart={removeFromCart}
         />
         {orders > 0 && <Button
           modifier='style_dark'

@@ -10,7 +10,6 @@ const Purchase = ({
   id,
   handleRemoveFromCart,
   is_in_shopping_cart,
-  updateOrders,
   ingredients
 }) => {
   const [ expanded, setExpanded ] = useState(false)
@@ -25,7 +24,6 @@ const Purchase = ({
           id,
           toAdd: false,
           callback: () => {
-            updateOrders()
             setToDelete(false)
           }
         })
@@ -58,7 +56,10 @@ const Purchase = ({
       <a
         href="#"
         className={styles.purchaseDelete}
-        onClick={_ => setToDelete(true)}
+        onClick={(e) => {
+          e.preventDefault()
+          setToDelete(true)
+        }}
       >
         <Icons.ReceiptDelete />
       </a>
